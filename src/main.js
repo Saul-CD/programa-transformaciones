@@ -57,143 +57,135 @@ actualizarInputs();
 const canvas = document.getElementById('canvas');
 const panzoomWrapper = document.getElementById('panzoom-wrapper');
 
-const centerX = window.innerWidth / 2;
-const centerY = window.innerHeight / 2;
+const centroX = window.innerWidth / 2;
+const centroY = window.innerHeight / 2;
 const panzoom = Panzoom(panzoomWrapper, {
     maxZoom: 450000,
     minZoom: 0.0012,
     initialZoom: 20,
 });
-panzoom.moveTo(centerX, centerY);
+panzoom.moveTo(centroX, centroY);
 
-// Habilitar el zoom usando la rueda del ratón
 canvas.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
 
-// --- NUEVA LÓGICA DEL GRID DINÁMICO ---
 const sistemaCoordenado = document.getElementById('sistema-coordenado');
-const gridLayer = document.getElementById('grid-layer');
+const cuadricula = document.getElementById('grid-layer');
 
 // Centrar el origen en medio de la pantalla y hacer que la 'Y' crezca hacia arriba
-sistemaCoordenado.setAttribute(
-    'transform',
-    // `translate(${centerX}, ${centerY}) scale(1, -1)`,
-    `scale(1, -1)`,
-);
+sistemaCoordenado.setAttribute('transform', `scale(1, -1)`);
 
 function actualizarCuadricula() {
-    // 1. Obtener estado actual de la cámara
     const transform = panzoom.getTransform();
     const scale = transform.scale;
     const tx = transform.x;
     const ty = transform.y;
-    console.log(tx);
 
-    // 2. Calcular el LOD (Level of Detail)
-    // Buscamos que visualmente haya unos 80px de separación entre líneas
-    const visualSpacing = 80;
-    const worldStepRaw = visualSpacing / scale;
+    // 80px de separación entre líneas aproximadamente
+    const separacion = 80;
 
-    // Magia algebraica para redondear el paso a magnitudes agradables (1, 2, 5, 10, 20...)
-    const magnitud = Math.pow(10, Math.floor(Math.log10(worldStepRaw)));
-    const normalizado = worldStepRaw / magnitud;
+    const magnitud = Math.pow(10, Math.floor(Math.log10(separacion / scale)));
+    const normalizado = separacion / scale / magnitud;
 
     let step;
     if (normalizado < 2) step = magnitud;
     else if (normalizado < 5) step = 2 * magnitud;
     else step = 5 * magnitud;
 
-    // 3. Calcular la "Caja Delimitadora" visible (Viewport to World mapping)
-    // Para no dibujar un millón de líneas, calculamos qué coordenadas existen dentro del monitor
     const w = window.innerWidth;
     const h = window.innerHeight;
 
-    // (Math.abs para evitar signos negativos raros por el flip de Y)
     const minX = -tx / scale;
     const maxX = (-tx + w) / scale;
-    const minY = (ty - h) / scale; // La traslación en Y se comporta distinto por el parent
+    const minY = (ty - h) / scale;
     const maxY = ty / scale;
 
-    // Expandir un poco el margen para que no se corten las líneas al mover rápido
-    const startX = Math.floor(minX / step) * step - step;
-    const endX = Math.ceil(maxX / step) * step + step;
-    const startY = Math.floor(minY / step) * step - step;
-    const endY = Math.ceil(maxY / step) * step + step;
+    const x0 = Math.floor(minX / step) * step - step;
+    const xn = Math.ceil(maxX / step) * step + step;
+    const y0 = Math.floor(minY / step) * step - step;
+    const yn = Math.ceil(maxY / step) * step + step;
 
-    // 4. Construir el SVG
-    let htmlGrid = '';
+    let cuadriculaHtml = '';
 
-    // Como el texto también sufre por el transform global, contrarrestamos su escala individualmente
-    const fontFix = `transform="scale(1, -1)"`;
-    const textSize = 12 / scale; // Ajuste para el tamaño de fuente relativo
+    const fontSize = 12 / scale;
 
-    // Generar Ejes y Cuadrícula X
-    for (let i = startX; i <= endX; i += step) {
+    for (let i = x0; i <= xn; i += step) {
         if (Math.abs(i) < 0.00001) continue;
-        htmlGrid += `
-            <line x1="${i}" y1="${startY}" x2="${i}" y2="${endY}" stroke="#222" stroke-width="1" />
-            <text x="${i}" y="0" ${fontFix} font-size="${textSize}" text-anchor="middle">${parseFloat(i.toPrecision(4))}</text>
+        cuadriculaHtml += `
+            <line x1="${i}" y1="${y0}" x2="${i}" y2="${yn}" stroke="#222" stroke-width="1" />
+            <text x="${i}" y="0" transform="scale(1, -1)" font-size="${fontSize}" text-anchor="middle">${parseFloat(i.toPrecision(4))}</text>
         `;
     }
 
-    // Generar Ejes y Cuadrícula Y
-    for (let j = startY; j <= endY; j += step) {
+    for (let j = y0; j <= yn; j += step) {
         if (Math.abs(j) < 0.00001) continue;
-        htmlGrid += `
-            <line x1="${startX}" y1="${j}" x2="${endX}" y2="${j}" stroke="#222" stroke-width="1" />
-            <text x="0" y="${-j}" ${fontFix} alignment-baseline="middle" text-anchor="end" font-size="${textSize}">${parseFloat(j.toPrecision(4))}</text>
+        cuadriculaHtml += `
+            <line x1="${x0}" y1="${j}" x2="${xn}" y2="${j}" stroke="#222" stroke-width="1" />
+            <text x="0" y="${-j}" transform="scale(1, -1)" alignment-baseline="middle" text-anchor="end" font-size="${fontSize}">${parseFloat(j.toPrecision(4))}</text>
         `;
     }
 
-    // Dibujar los Ejes Principales (X e Y) más gruesos y por encima
-    htmlGrid += `
-        <line x1="${startX}" y1="0" x2="${endX}" y2="0" stroke="#888" stroke-width="2" />
-        <line x1="0" y1="${startY}" x2="0" y2="${endY}" stroke="#888" stroke-width="2" />
+    cuadriculaHtml += `
+        <line x1="${x0}" y1="0" x2="${xn}" y2="0" stroke="#888" stroke-width="2" />
+        <line x1="0" y1="${y0}" x2="0" y2="${yn}" stroke="#888" stroke-width="2" />
     `;
 
-    gridLayer.innerHTML = htmlGrid;
+    cuadricula.innerHTML = cuadriculaHtml;
 }
 
-// Escuchar el evento de Panzoom que descubriste
 panzoom.on('transform', actualizarCuadricula);
-// Dibujar la cuadrícula en la primera carga
 actualizarCuadricula();
 
-// Función que toma un arreglo de {x, y} y lo dibuja en el SVG
-function dibujarPoligono(puntos, esInicial = false) {
-    const puntosString = puntos.map((p) => `${p.x},${p.y}`).join(' ');
+function dibujarPoligono(
+    puntos,
+    esInicial = false,
+    descripcion = 'Polígono Inicial',
+) {
+    if (!esInicial) {
+        const poligonosViejos = plano.querySelectorAll('polygon');
+        poligonosViejos.forEach((p) => {
+            p.setAttribute('opacity', '0.4');
+        });
+    }
 
+    const puntosString = puntos.map((p) => `${p.x},${p.y}`).join(' ');
     const poligonoElement = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'polygon',
     );
     poligonoElement.setAttribute('points', puntosString);
 
-    // Colores dinámicos para ver la superposición (Requisito 4)
-    const color = numTransformaciones * 40;
-    poligonoElement.setAttribute(
-        'fill',
-        esInicial
-            ? 'rgba(255, 255, 255, 0.2)'
-            : `hsla(${color}, 70%, 50%, 0.5)`,
-    );
-    poligonoElement.setAttribute(
-        'stroke',
-        esInicial ? 'white' : `hsl(${color}, 70%, 50%)`,
-    );
+    const hue = numTransformaciones * 40;
+    const colorFondo = esInicial
+        ? 'rgba(255, 255, 255, 0.2)'
+        : `hsla(${hue}, 70%, 60%, 0.5)`;
+    const colorBorde = esInicial ? 'white' : `hsl(${hue}, 70%, 50%)`;
+
+    poligonoElement.setAttribute('fill', colorFondo);
+    poligonoElement.setAttribute('stroke', colorBorde);
     poligonoElement.setAttribute('stroke-width', '2');
 
+    poligonoElement.style.transition =
+        'opacity 0.3s ease, stroke-width 0.3s ease';
+
     plano.appendChild(poligonoElement);
-    agregarAlHistorial(puntos);
+
+    agregarAlHistorial(puntos, colorBorde, descripcion);
 }
 
-function agregarAlHistorial(puntos) {
+function agregarAlHistorial(puntos, colorHexHsl, descripcion) {
     const li = document.createElement('li');
+
+    li.style.borderLeft = `4px solid ${colorHexHsl}`;
+
     li.innerHTML =
-        `<h3>Paso ${numTransformaciones}</h3><br>` +
+        `<h3 style="margin: 0; padding-bottom: 5px; color: ${colorHexHsl};">${descripcion}</h3>` +
+        `<div style="font-family: monospace; font-size: 0.9em; opacity: 0.8;">` +
         puntos
             .map((p) => `(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`)
-            .join('<br>');
-    historialLista.prepend(li); // Requisito 5: Agregar al tope
+            .join('<br>') +
+        `</div>`;
+
+    historialLista.prepend(li);
 }
 
 document.getElementById('btn-inicial').addEventListener('click', () => {
@@ -204,13 +196,19 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
     const tipo = document.getElementById('select-poligono').value;
     poligonoActual = [...poligonos[tipo]];
 
-    dibujarPoligono(poligonoActual, true);
+    const nombreFormateado = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    dibujarPoligono(
+        poligonoActual,
+        true,
+        `Polígono Inicial: ${nombreFormateado}`,
+    );
 });
 
 document.getElementById('btn-transformar').addEventListener('click', () => {
     if (poligonoActual.length === 0) return alert('Dibuja un polígono primero');
 
     const tipo = document.getElementById('select-transformacion').value;
+    let descripcion = '';
 
     let matriz;
     switch (tipo) {
@@ -218,6 +216,7 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
             const X = Number(document.getElementById('input-x').value);
             const Y = Number(document.getElementById('input-y').value);
             matriz = matrizTraslacion(X, Y);
+            descripcion = `Traslación (dx: ${X}, dy: ${Y})`;
             break;
         case 'rotacion':
             const angulo = Number(
@@ -230,11 +229,13 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
                 document.getElementById('input-pivote-y').value,
             );
             matriz = matrizRotacion(angulo * (Math.PI / 180), pivotX, pivotY);
+            descripcion = `Rotación (${angulo}° en (${pivotX}, ${pivotY}))`;
             break;
         case 'escalamiento':
             const Sx = Number(document.getElementById('input-sx').value);
             const Sy = Number(document.getElementById('input-sy').value);
             matriz = matrizEscalamiento(Sx, Sy);
+            descripcion = `Escalamiento (Sx: ${Sx}, Sy: ${Sy})`;
             break;
         default:
             console.error('Transformación no reconocida');
@@ -244,7 +245,7 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
     poligonoActual = transformarPoligono(poligonoActual, matriz);
 
     numTransformaciones++;
-    dibujarPoligono(poligonoActual);
+    dibujarPoligono(poligonoActual, false, descripcion);
 });
 
 // --- LÓGICA UI MÓVIL ---
