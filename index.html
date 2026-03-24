@@ -59,25 +59,55 @@
 
                 <div id="entradas"></div>
 
-                <button
-                    id="btn-transformar"
-                    class="boton-transformar"
-                    style="margin-top: 15px"
-                >
-                    Aplicar Transformación
-                </button>
+                <div id="acciones-principales">
+                    <button id="btn-transformar" class="boton-transformar">
+                        Transformar
+                    </button>
+                </div>
 
-                <button
-                    id="btn-reiniciar"
+                <div
+                    id="estado-confirmacion"
                     style="
-                        margin-top: 25px;
-                        background: transparent;
-                        border: 1px solid #555;
-                        color: #aaa;
+                        display: none;
+                        background: rgba(0, 0, 0, 0.3);
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-top: 15px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
                     "
                 >
-                    ← Cambiar Polígono
-                </button>
+                    <p
+                        style="
+                            font-size: 0.95rem;
+                            margin-bottom: 12px;
+                            text-align: center;
+                            color: #a5d6ff;
+                        "
+                    >
+                        ✅ ¡Transformación aplicada! ¿Deseas hacer otra sobre
+                        las nuevas coordenadas?
+                    </p>
+                    <div style="display: flex; gap: 10px">
+                        <button
+                            id="btn-si-otra"
+                            class="boton-transformar"
+                            style="flex: 1"
+                        >
+                            Sí, continuar
+                        </button>
+                        <button
+                            id="btn-no-terminar"
+                            style="
+                                flex: 1;
+                                background: transparent;
+                                border: 1px solid #ff7b72;
+                                color: #ff7b72;
+                            "
+                        >
+                            No, reiniciar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Panel de Historial -->

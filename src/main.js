@@ -43,6 +43,12 @@ const historialLista = document.getElementById('historial');
 const inputs = document.getElementById('entradas');
 const transformSelect = document.getElementById('select-transformacion');
 
+const btnTransformar = document.getElementById('btn-transformar');
+const accionesPrincipales = document.getElementById('acciones-principales');
+const estadoConfirmacion = document.getElementById('estado-confirmacion');
+const btnSiOtra = document.getElementById('btn-si-otra');
+const btnNoTerminar = document.getElementById('btn-no-terminar');
+
 function actualizarInputs() {
     inputs.innerHTML = '';
 
@@ -153,7 +159,7 @@ const vistaTransformacion = document.getElementById('vista-transformacion');
 const selectPoligono = document.getElementById('select-poligono');
 const entradasCoordenadas = document.getElementById('entradas-coordenadas');
 
-function renderizarInputsCoordenadas() {
+function actualizarInputsCoordenadas() {
     const tipo = selectPoligono.value;
     const vertices = poligonos[tipo];
 
@@ -175,8 +181,8 @@ function renderizarInputsCoordenadas() {
     });
 }
 
-selectPoligono.addEventListener('change', renderizarInputsCoordenadas);
-renderizarInputsCoordenadas();
+selectPoligono.addEventListener('change', actualizarInputsCoordenadas);
+actualizarInputsCoordenadas();
 
 function dibujarPoligono(
     puntos,
@@ -257,7 +263,26 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
     vistaTransformacion.style.display = 'block';
 });
 
-document.getElementById('btn-reiniciar').addEventListener('click', () => {
+btnSiOtra.addEventListener('click', () => {
+    estadoConfirmacion.style.display = 'none';
+    accionesPrincipales.style.display = 'block';
+
+    transformSelect.disabled = false;
+    const inputsNodos = document.querySelectorAll('#entradas input');
+    inputsNodos.forEach((input) => {
+        input.disabled = false;
+    });
+});
+
+btnNoTerminar.addEventListener('click', () => {
+    estadoConfirmacion.style.display = 'none';
+    accionesPrincipales.style.display = 'block';
+    transformSelect.disabled = false;
+
+    plano.innerHTML = '';
+    historialLista.innerHTML = '';
+    numTransformaciones = 0;
+
     vistaTransformacion.style.display = 'none';
     vistaConfiguracion.style.display = 'block';
 });
@@ -299,11 +324,15 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
             console.error('Transformación no reconocida');
             break;
     }
-
     poligonoActual = transformarPoligono(poligonoActual, matriz);
-
     numTransformaciones++;
     dibujarPoligono(poligonoActual, false, descripcion);
+
+    accionesPrincipales.style.display = 'none';
+    estadoConfirmacion.style.display = 'block';
+    transformSelect.disabled = true;
+    const inputsNodos = document.querySelectorAll('#entradas input');
+    inputsNodos.forEach((input) => (input.disabled = true));
 });
 
 // --- LÓGICA UI MÓVIL ---
