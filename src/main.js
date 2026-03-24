@@ -1,10 +1,5 @@
 import Panzoom from 'panzoom';
-import {
-    matrizTraslacion,
-    transformarPoligono,
-    matrizRotacion,
-    matrizEscalamiento,
-} from './math.js';
+import { trasladarPoligono, escalarPoligono, rotarPoligono } from './math.js';
 import './style.css';
 
 const poligonos = {
@@ -46,7 +41,6 @@ const historialLista = document.getElementById('historial');
 const inputs = document.getElementById('entradas');
 const transformSelect = document.getElementById('select-transformacion');
 
-const btnTransformar = document.getElementById('btn-transformar');
 const accionesPrincipales = document.getElementById('acciones-principales');
 const estadoConfirmacion = document.getElementById('estado-confirmacion');
 const btnSiOtra = document.getElementById('btn-si-otra');
@@ -200,11 +194,7 @@ function actualizarInputsCoordenadas() {
 
 actualizarInputsCoordenadas();
 
-function dibujarPoligono(
-    puntos,
-    esInicial = false,
-    descripcion = 'Polígono Inicial',
-) {
+function dibujarPoligono(puntos, esInicial = false) {
     if (!esInicial) {
         const poligonosViejos = plano.querySelectorAll('polygon');
         poligonosViejos.forEach((p) => {
@@ -234,22 +224,40 @@ function dibujarPoligono(
 
     plano.appendChild(poligonoElement);
 
-    agregarAlHistorial(puntos, colorBorde, descripcion);
+    return colorBorde;
 }
 
-function agregarAlHistorial(puntos, colorHexHsl, descripcion) {
+// paresDescripcionPuntos es un diccionario con la clave la descripción/significado de la lista de puntos, y el valor una lista de puntos
+function agregarAlHistorial(
+    paresDescripcionPuntos,
+    colorHexHsl,
+    descripcionGeneral,
+) {
     const li = document.createElement('li');
 
     li.style.borderLeft = `4px solid ${colorHexHsl}`;
 
-    li.innerHTML =
-        `<h3 style="margin: 0; padding-bottom: 5px; color: ${colorHexHsl};">${descripcion}</h3>` +
-        `<div style="font-family: monospace; font-size: 0.9em; opacity: 0.8;">` +
-        puntos
-            .map((p) => `(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`)
-            .join('<br>') +
-        `</div>`;
+    li.innerHTML = `
+            <h3 style="margin: 0; padding-bottom: 5px; color: ${colorHexHsl};">${descripcionGeneral}</h3>`;
 
+    for (const [descripcion, puntos] of Object.entries(
+        paresDescripcionPuntos,
+    )) {
+        //  li.innerHTML =
+        //      `<h3 style="margin: 0; padding-bottom: 5px; color: ${colorHexHsl};">${descripcion}</h3>` +
+        //      `<div style="font-family: monospace; font-size: 0.9em; opacity: 0.8;">` +
+        //      puntos
+        //          .map((p) => `(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`)
+        //          .join('<br>') +
+        //      `</div>`;
+        li.innerHTML += `
+            <div style="margin-top: 10px;">
+                <strong style="font-size: 0.85em; color: #aaa; display: block; margin-bottom: 4px;">${descripcion}</strong>
+                <div style="font-family: monospace; font-size: 0.9em; opacity: 0.9; padding-left: 8px; border-left: 2px solid rgba(255,255,255,0.1);">
+                    ${puntos.map((p) => `(${p.x.toFixed(2)}, ${p.y.toFixed(2)})`).join('<br>')}
+                </div>
+            </div>`;
+    }
     historialLista.prepend(li);
 }
 
@@ -269,9 +277,10 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
     }
 
     const nombreFormateado = tipo.charAt(0).toUpperCase() + tipo.slice(1);
-    dibujarPoligono(
-        poligonoActual,
-        true,
+    const color = dibujarPoligono(poligonoActual, true);
+    agregarAlHistorial(
+        { Coordenadas: poligonoActual },
+        color,
         `Polígono Inicial: ${nombreFormateado}`,
     );
 
@@ -308,14 +317,15 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
 
     const tipo = document.getElementById('select-transformacion').value;
     let descripcion = '';
+    let datosHistorial = {};
 
-    let matriz;
     switch (tipo) {
         case 'traslacion':
-            const X = Number(document.getElementById('input-x').value);
-            const Y = Number(document.getElementById('input-y').value);
-            matriz = matrizTraslacion(X, Y);
-            descripcion = `Traslación (dx: ${X}, dy: ${Y})`;
+            const dx = Number(document.getElementById('input-x').value);
+            const dy = Number(document.getElementById('input-y').value);
+            descripcion = `Traslación (dx: ${dx}, dy: ${dy})`;
+            poligonoActual = trasladarPoligono(poligonoActual, dx, dy);
+            datosHistorial = { Resultado: poligonoActual };
             break;
         case 'rotacion':
             const angulo = Number(
@@ -327,22 +337,42 @@ document.getElementById('btn-transformar').addEventListener('click', () => {
             const pivotY = Number(
                 document.getElementById('input-pivote-y').value,
             );
-            matriz = matrizRotacion(angulo * (Math.PI / 180), pivotX, pivotY);
-            descripcion = `Rotación (${angulo}° en (${pivotX}, ${pivotY}))`;
+            const anguloRad = angulo * (Math.PI / 180);
+
+            descripcion = `Rotación (${angulo}° en P(${pivotX}, ${pivotY}))`;
+
+            // Algoritmo visto en clase
+            // 1. Restar el pivote
+            const paso1 = trasladarPoligono(poligonoActual, -pivotX, -pivotY);
+
+            // 2. Rotar sobre el origen
+            const paso2 = rotarPoligono(paso1, anguloRad);
+
+            // 3. Sumar el pivote de nuevo
+            const paso3 = trasladarPoligono(paso2, pivotX, pivotY);
+
+            poligonoActual = paso3;
+
+            datosHistorial = {
+                '1. Restar el pivote': paso1,
+                '2. Rotar sobre el origen': paso2,
+                '3. Sumar el pivote': paso3,
+            };
             break;
         case 'escalamiento':
             const Sx = Number(document.getElementById('input-sx').value);
             const Sy = Number(document.getElementById('input-sy').value);
-            matriz = matrizEscalamiento(Sx, Sy);
             descripcion = `Escalamiento (Sx: ${Sx}, Sy: ${Sy})`;
+            poligonoActual = escalarPoligono(poligonoActual, Sx, Sy);
+            datosHistorial = { Resultado: poligonoActual };
             break;
         default:
             console.error('Transformación no reconocida');
             break;
     }
-    poligonoActual = transformarPoligono(poligonoActual, matriz);
     numTransformaciones++;
-    dibujarPoligono(poligonoActual, false, descripcion);
+    const color = dibujarPoligono(poligonoActual);
+    agregarAlHistorial(datosHistorial, color, descripcion);
 
     accionesPrincipales.style.display = 'none';
     estadoConfirmacion.style.display = 'block';
