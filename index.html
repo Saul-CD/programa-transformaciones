@@ -23,18 +23,90 @@
             </g>
         </svg>
 
+        <!-- Panel de Controles -->
         <div class="panel controles">
             <h2>Controles</h2>
 
             <div id="vista-configuracion">
-                <label>Seleccionar Polígono:</label>
-                <select id="select-poligono">
-                    <option value="triangulo">Triángulo</option>
-                    <option value="cuadrado">Cuadrado</option>
-                    <option value="rectangulo">Rectángulo</option>
-                    <option value="pentagono">Pentágono</option>
-                </select>
+                <label style="display: block; margin-bottom: 10px"
+                    >Seleccionar Polígono:</label
+                >
+                <div id="selector-poligonos" class="grid-poligonos">
+                    <button class="btn-poly active" data-poly="triangulo">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M12 3L22 20H2L12 3z"></path>
+                        </svg>
+                        <span>Triángulo</span>
+                    </button>
 
+                    <button class="btn-poly" data-poly="rectangulo">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect
+                                x="3"
+                                y="6"
+                                width="18"
+                                height="12"
+                                rx="2"
+                                ry="2"
+                            ></rect>
+                        </svg>
+                        <span>Rectángulo</span>
+                    </button>
+
+                    <button class="btn-poly" data-poly="pentagono">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polygon
+                                points="12 2 22 8.5 18 22 6 22 2 8.5"
+                            ></polygon>
+                        </svg>
+                        <span>Pentágono</span>
+                    </button>
+
+                    <button class="btn-poly" data-poly="hexagono">
+                        <svg
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polygon
+                                points="12 2 22 7 22 17 12 22 2 17 2 7"
+                            ></polygon>
+                        </svg>
+                        <span>Hexágono</span>
+                    </button>
+                </div>
                 <label style="margin-top: 30px; display: block"
                     >Editar Coordenadas Iniciales:</label
                 >
@@ -84,8 +156,8 @@
                             color: #a5d6ff;
                         "
                     >
-                        ✅ ¡Transformación aplicada! ¿Deseas hacer otra sobre
-                        las nuevas coordenadas?
+                        ¡Transformación aplicada! ¿Deseas hacer otra sobre las
+                        nuevas coordenadas?
                     </p>
                     <div style="display: flex; gap: 10px">
                         <button

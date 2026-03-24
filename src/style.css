@@ -176,3 +176,42 @@ text {
     stroke-width: 2px;
     paint-order: stroke fill;
 }
+
+/* Agrega esto a tu style.css */
+.grid-poligonos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-poly {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px 10px;
+    color: #c9d1d9;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-poly:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-poly.active {
+    background: rgba(88, 166, 255, 0.15);
+    border-color: #58a6ff;
+    color: #58a6ff;
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+}
+
+.btn-poly span {
+    font-size: 0.85rem;
+    font-weight: 500;
+}

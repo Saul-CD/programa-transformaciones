@@ -13,12 +13,6 @@ const poligonos = {
         { x: 10, y: 0 },
         { x: 5, y: 10 },
     ],
-    cuadrado: [
-        { x: 0, y: 0 },
-        { x: 10, y: 0 },
-        { x: 10, y: 10 },
-        { x: 0, y: 10 },
-    ],
     rectangulo: [
         { x: 0, y: 0 },
         { x: 20, y: 0 },
@@ -32,10 +26,19 @@ const poligonos = {
         { x: 20, y: 30 },
         { x: 0, y: 15 },
     ],
+    hexagono: [
+        { x: 10, y: 0 },
+        { x: 30, y: 0 },
+        { x: 40, y: 20 },
+        { x: 30, y: 40 },
+        { x: 10, y: 40 },
+        { x: 0, y: 20 },
+    ],
 };
 
 let poligonoActual = [];
 let numTransformaciones = 0;
+let tipoPoligonoSeleccionado = 'triangulo';
 
 const plano = document.getElementById('plano');
 const historialLista = document.getElementById('historial');
@@ -156,12 +159,26 @@ actualizarCuadricula();
 
 const vistaConfiguracion = document.getElementById('vista-configuracion');
 const vistaTransformacion = document.getElementById('vista-transformacion');
-const selectPoligono = document.getElementById('select-poligono');
+
+const botonesPoly = document.querySelectorAll('.btn-poly');
 const entradasCoordenadas = document.getElementById('entradas-coordenadas');
 
+// --- Nueva lógica para la selección visual de polígonos ---
+botonesPoly.forEach((boton) => {
+    boton.addEventListener('click', () => {
+        // 1. Quitar la clase 'active' de todos los botones
+        botonesPoly.forEach((b) => b.classList.remove('active'));
+        // 2. Agregar 'active' al botón clickeado
+        boton.classList.add('active');
+        // 3. Actualizar la variable de estado usando el atributo data-poly
+        tipoPoligonoSeleccionado = boton.dataset.poly;
+        // 4. Actualizar las cajas de texto con los vértices
+        actualizarInputsCoordenadas();
+    });
+});
+
 function actualizarInputsCoordenadas() {
-    const tipo = selectPoligono.value;
-    const vertices = poligonos[tipo];
+    const vertices = poligonos[tipoPoligonoSeleccionado];
 
     entradasCoordenadas.innerHTML = '';
 
@@ -181,7 +198,6 @@ function actualizarInputsCoordenadas() {
     });
 }
 
-selectPoligono.addEventListener('change', actualizarInputsCoordenadas);
 actualizarInputsCoordenadas();
 
 function dibujarPoligono(
@@ -242,7 +258,7 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
     historialLista.innerHTML = '';
     numTransformaciones = 0;
 
-    const tipo = selectPoligono.value;
+    const tipo = tipoPoligonoSeleccionado;
     const numVertices = poligonos[tipo].length;
     poligonoActual = [];
 
