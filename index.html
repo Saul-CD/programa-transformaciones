@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Transformaciones 2D</title>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
+
+    <body>
+        <!-- Plano cartesiano -->
+        <!-- TODO: Mejorar el plano para mostrar ejes graduados y con grid lines dinamicas. -->
+        <svg
+            id="canvas"
+            preserveAspectRatio="xMidYMid meet"
+            style="width: 100vw; height: 100vh; overflow: hidden"
+        >
+            <g id="panzoom-wrapper">
+                <g id="sistema-coordenado">
+                    <g id="grid-layer"></g>
+                    <g id="plano"></g>
+                </g>
+            </g>
+        </svg>
+
+        <!-- Panel de Controles -->
+        <div class="panel controles">
+            <h2>Controles</h2>
+
+            <!-- Selección de Polígono -->
+            <label>Seleccionar Polígono:</label>
+            <select id="select-poligono">
+                <option value="triangulo">Triángulo</option>
+                <option value="cuadrado">Cuadrado</option>
+            </select>
+            <button id="btn-inicial">Graficar Inicial</button>
+
+            <!-- Selección de Transformación -->
+            <label>Transformación:</label>
+            <select id="select-transformacion">
+                <option value="traslacion">Traslación</option>
+                <option value="rotacion">Rotación</option>
+                <option value="escalamiento">Escalamiento</option>
+            </select>
+
+            <!-- Entradas de Valores -->
+            <div id="entradas">
+                <label>Valores:</label>
+            </div>
+
+            <!-- Botón de Aplicar Transformación -->
+            <button id="btn-transformar" class="boton-transformar">
+                Transformar
+            </button>
+        </div>
+
+        <!-- Panel de Historial -->
+        <div class="panel historial">
+            <h2>Historial</h2>
+            <ul id="historial"></ul>
+        </div>
+
+        <!-- Botones flotantes en modo movil -->
+        <div class="mobile-fab-container">
+            <button id="fab-controls" class="fab">⚙️</button>
+            <button id="fab-history" class="fab">📜</button>
+        </div>
+
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>
