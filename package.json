@@ -12,6 +12,7 @@
         "vite": "^8.0.1"
     },
     "dependencies": {
+        "material-icons": "^1.13.14",
         "panzoom": "^9.4.3"
     },
     "prettier": {
