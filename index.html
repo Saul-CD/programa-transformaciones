@@ -23,35 +23,63 @@
             </g>
         </svg>
 
-        <!-- Panel de Controles -->
         <div class="panel controles">
             <h2>Controles</h2>
 
-            <!-- Selección de Polígono -->
-            <label>Seleccionar Polígono:</label>
-            <select id="select-poligono">
-                <option value="triangulo">Triángulo</option>
-                <option value="cuadrado">Cuadrado</option>
-            </select>
-            <button id="btn-inicial">Graficar Inicial</button>
+            <div id="vista-configuracion">
+                <label>Seleccionar Polígono:</label>
+                <select id="select-poligono">
+                    <option value="triangulo">Triángulo</option>
+                    <option value="cuadrado">Cuadrado</option>
+                    <option value="rectangulo">Rectángulo</option>
+                    <option value="pentagono">Pentágono</option>
+                </select>
 
-            <!-- Selección de Transformación -->
-            <label>Transformación:</label>
-            <select id="select-transformacion">
-                <option value="traslacion">Traslación</option>
-                <option value="rotacion">Rotación</option>
-                <option value="escalamiento">Escalamiento</option>
-            </select>
+                <label style="margin-top: 30px; display: block"
+                    >Editar Coordenadas Iniciales:</label
+                >
+                <div id="entradas-coordenadas" style="overflow-y: auto"></div>
 
-            <!-- Entradas de Valores -->
-            <div id="entradas"></div>
+                <button
+                    id="btn-inicial"
+                    style="margin-top: 15px"
+                    class="boton-primario"
+                >
+                    Graficar y Continuar →
+                </button>
+            </div>
 
-            <!-- Botón de Aplicar Transformación -->
-            <button id="btn-transformar" class="boton-transformar">
-                Transformar
-            </button>
+            <div id="vista-transformacion" style="display: none">
+                <label>Transformación:</label>
+                <select id="select-transformacion">
+                    <option value="traslacion">Traslación</option>
+                    <option value="rotacion">Rotación</option>
+                    <option value="escalamiento">Escalamiento</option>
+                </select>
+
+                <div id="entradas"></div>
+
+                <button
+                    id="btn-transformar"
+                    class="boton-transformar"
+                    style="margin-top: 15px"
+                >
+                    Aplicar Transformación
+                </button>
+
+                <button
+                    id="btn-reiniciar"
+                    style="
+                        margin-top: 25px;
+                        background: transparent;
+                        border: 1px solid #555;
+                        color: #aaa;
+                    "
+                >
+                    ← Cambiar Polígono
+                </button>
+            </div>
         </div>
-
         <!-- Panel de Historial -->
         <div class="panel historial">
             <h2>Historial</h2>

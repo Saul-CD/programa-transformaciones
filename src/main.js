@@ -19,6 +19,19 @@ const poligonos = {
         { x: 10, y: 10 },
         { x: 0, y: 10 },
     ],
+    rectangulo: [
+        { x: 0, y: 0 },
+        { x: 20, y: 0 },
+        { x: 20, y: 10 },
+        { x: 0, y: 10 },
+    ],
+    pentagono: [
+        { x: 10, y: 0 },
+        { x: 30, y: 0 },
+        { x: 40, y: 15 },
+        { x: 20, y: 30 },
+        { x: 0, y: 15 },
+    ],
 };
 
 let poligonoActual = [];
@@ -135,6 +148,36 @@ function actualizarCuadricula() {
 panzoom.on('transform', actualizarCuadricula);
 actualizarCuadricula();
 
+const vistaConfiguracion = document.getElementById('vista-configuracion');
+const vistaTransformacion = document.getElementById('vista-transformacion');
+const selectPoligono = document.getElementById('select-poligono');
+const entradasCoordenadas = document.getElementById('entradas-coordenadas');
+
+function renderizarInputsCoordenadas() {
+    const tipo = selectPoligono.value;
+    const vertices = poligonos[tipo];
+
+    entradasCoordenadas.innerHTML = '';
+
+    vertices.forEach((vertice, index) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.gap = '5px';
+        div.style.marginBottom = '5px';
+        div.style.alignItems = 'center';
+
+        div.innerHTML = `
+            <span style="min-width: 25px; font-size: 0.8em; color: #888;">P${index}</span>
+            <input type="number" id="v${index}-x" value="${vertice.x}" placeholder="X">
+            <input type="number" id="v${index}-y" value="${vertice.y}" placeholder="Y">
+        `;
+        entradasCoordenadas.appendChild(div);
+    });
+}
+
+selectPoligono.addEventListener('change', renderizarInputsCoordenadas);
+renderizarInputsCoordenadas();
+
 function dibujarPoligono(
     puntos,
     esInicial = false,
@@ -193,8 +236,15 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
     historialLista.innerHTML = '';
     numTransformaciones = 0;
 
-    const tipo = document.getElementById('select-poligono').value;
-    poligonoActual = [...poligonos[tipo]];
+    const tipo = selectPoligono.value;
+    const numVertices = poligonos[tipo].length;
+    poligonoActual = [];
+
+    for (let i = 0; i < numVertices; i++) {
+        const x = Number(document.getElementById(`v${i}-x`).value);
+        const y = Number(document.getElementById(`v${i}-y`).value);
+        poligonoActual.push({ x, y });
+    }
 
     const nombreFormateado = tipo.charAt(0).toUpperCase() + tipo.slice(1);
     dibujarPoligono(
@@ -202,6 +252,14 @@ document.getElementById('btn-inicial').addEventListener('click', () => {
         true,
         `Polígono Inicial: ${nombreFormateado}`,
     );
+
+    vistaConfiguracion.style.display = 'none';
+    vistaTransformacion.style.display = 'block';
+});
+
+document.getElementById('btn-reiniciar').addEventListener('click', () => {
+    vistaTransformacion.style.display = 'none';
+    vistaConfiguracion.style.display = 'block';
 });
 
 document.getElementById('btn-transformar').addEventListener('click', () => {
