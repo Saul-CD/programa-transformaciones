@@ -8,8 +8,6 @@
     </head>
 
     <body>
-        <!-- Plano cartesiano -->
-        <!-- TODO: Mejorar el plano para mostrar ejes graduados y con grid lines dinamicas. -->
         <svg
             id="canvas"
             preserveAspectRatio="xMidYMid meet"
@@ -112,11 +110,7 @@
                 >
                 <div id="entradas-coordenadas" style="overflow-y: auto"></div>
 
-                <button
-                    id="btn-inicial"
-                    style="margin-top: 15px"
-                    class="boton-primario"
-                >
+                <button id="btn-inicial" style="margin-top: 15px" class="boton">
                     Graficar y Continuar →
                 </button>
             </div>
@@ -132,21 +126,15 @@
                 <div id="entradas"></div>
 
                 <div id="acciones-principales">
-                    <button id="btn-transformar" class="boton-transformar">
+                    <button id="btn-transformar" class="boton">
                         Transformar
                     </button>
                 </div>
 
                 <div
                     id="estado-confirmacion"
-                    style="
-                        display: none;
-                        background: rgba(0, 0, 0, 0.3);
-                        padding: 15px;
-                        border-radius: 8px;
-                        margin-top: 15px;
-                        border: 1px solid rgba(255, 255, 255, 0.1);
-                    "
+                    class="estado-confirmacion"
+                    style="display: none"
                 >
                     <p
                         style="
@@ -160,22 +148,10 @@
                         nuevas coordenadas?
                     </p>
                     <div style="display: flex; gap: 10px">
-                        <button
-                            id="btn-si-otra"
-                            class="boton-transformar"
-                            style="flex: 1"
-                        >
+                        <button id="btn-si-otra" class="boton" style="flex: 1">
                             Sí, continuar
                         </button>
-                        <button
-                            id="btn-no-terminar"
-                            style="
-                                flex: 1;
-                                background: transparent;
-                                border: 1px solid #ff7b72;
-                                color: #ff7b72;
-                            "
-                        >
+                        <button id="btn-no-terminar" class="boton-secundario">
                             No, reiniciar
                         </button>
                     </div>

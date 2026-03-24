@@ -20,7 +20,6 @@ svg#canvas {
     z-index: 1;
 }
 
-/* Paneles flotantes (Glassmorphism) */
 .panel {
     position: absolute;
     top: 20px;
@@ -63,14 +62,26 @@ button {
     border-radius: 6px;
 }
 
-button.boton-transformar {
+button.boton {
     background: #58a6ff;
     color: #000;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
 }
-button.boton-transformar:hover {
+button.boton:hover {
+    opacity: 0.8;
+}
+
+button.boton-secundario {
+    flex: 1;
+    background: transparent;
+    border: 1px solid #ff7b72;
+    color: #ff7b72;
+    cursor: pointer;
+    transition: 0.2s;
+}
+button.boton-secundario:hover {
     opacity: 0.8;
 }
 
@@ -86,7 +97,6 @@ button.boton-transformar:hover {
     border-radius: 6px;
 }
 
-/* Hacer que el lienzo parezca arrastrable */
 svg#canvas {
     cursor: grab;
 }
@@ -95,19 +105,16 @@ svg#canvas:active {
     cursor: grabbing;
 }
 
-/* Evitar que clics accidentales en el SVG seleccionen texto de los paneles */
 body {
     user-select: none;
 }
 
-/* Permitir interacción en los inputs */
 input,
 select,
 button {
     user-select: auto;
 }
 
-/* --- ESTILOS BASE PARA LOS FAB (Ocultos en Desktop) --- */
 .mobile-fab-container {
     display: none;
     position: absolute;
@@ -130,12 +137,10 @@ button {
 
 /* --- MODO MÓVIL (Pantallas menores a 768px) --- */
 @media (max-width: 768px) {
-    /* Mostrar los botones flotantes */
     .mobile-fab-container {
         display: flex;
     }
 
-    /* Mutar los paneles laterales a Bottom Sheets */
     .panel {
         top: auto;
         bottom: -100%; /* Escondidos por defecto fuera de la pantalla */
@@ -147,7 +152,7 @@ button {
         border-bottom: none;
         border-left: none;
         border-right: none;
-        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animación suave */
+        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 40;
     }
 
@@ -177,7 +182,6 @@ text {
     paint-order: stroke fill;
 }
 
-/* Agrega esto a tu style.css */
 .grid-poligonos {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -214,4 +218,15 @@ text {
 .btn-poly span {
     font-size: 0.85rem;
     font-weight: 500;
+}
+
+.alerta-confirmacion {
+}
+
+.estado-confirmacion {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
